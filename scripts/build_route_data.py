@@ -39,10 +39,10 @@ def read_rows(zf: zipfile.ZipFile, filename: str):
 def stop_matches(name: str, kind: str) -> bool:
     value = norm(name)
     if kind == "origin":
-        # Match only the requested Electronic City boarding stop or its explicit landmark name.
-        return value in ("INFOSYSFOUNDATION", "ELECTRONICCITY378")
-    # Avoid false positives such as Chikka Thogurupalya.
-    return value == "THOGURCROSS"
+        # Either requested boarding point on Neeladri Road is an accepted start.
+        return value in ("NEELADRINAGARA", "CONCORDAPARTMENTELECTRONICCITY")
+    # The corridor ends at the Electronic City 378 terminal stop.
+    return value == "ELECTRONICCITY378"
 
 def route_matches(route: dict, spec: dict) -> bool:
     short = norm(route.get("route_short_name", ""))
