@@ -44,7 +44,6 @@ def stop_matches(name: str, kind: str) -> bool:
         # boarding area as Infosys Foundation, 1st Main Road, or Electronic City 378.
         return any(alias in value for alias in (
             "INFOSYSFOUNDATION",
-            "1STMAINROAD",
             "ELECTRONICCITY378",
         ))
     return "TOGURU" in value or "THOGUR" in value
