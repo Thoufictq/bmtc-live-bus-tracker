@@ -246,15 +246,12 @@ def main():
         },
         "stop_name_diagnostics": stop_name_diagnostics,
         "trip_coverage_diagnostics": {
-            r["label"]: coverage_by_label
+            r["label"]: {
+                "origin_only": sum(coverage[rid]["origin_only"] for rid in r["route_ids"]),
+                "destination_only": sum(coverage[rid]["destination_only"] for rid in r["route_ids"]),
+                "both": sum(coverage[rid]["both"] for rid in r["route_ids"]),
+            }
             for r in route_results
-            for coverage_by_label in [{
-                key: {
-                    "origin_only": sum(coverage[rid]["origin_only"] for rid in r["route_ids"]),
-                    "destination_only": sum(coverage[rid]["destination_only"] for rid in r["route_ids"]),
-                    "both": sum(coverage[rid]["both"] for rid in r["route_ids"]),
-                }
-            }]
         },
         "routes": route_results,
         "notes": [
