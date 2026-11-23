@@ -1,6 +1,10 @@
 name: Refresh BMTC route data
 
 on:
+  push:
+    paths:
+      - 'scripts/build_route_data.py'
+      - '.github/workflows/refresh-bmtc-route-data.yml'
   workflow_dispatch:
   schedule:
     - cron: "30 20 * * *"
