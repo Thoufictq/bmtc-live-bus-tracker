@@ -44,3 +44,10 @@ Open `index.html` in a browser, or serve the folder with any static web server. 
 ## Attribution
 
 Live transit data: [Reclaim.city](https://maps.reclaim.city/bengaluru/). Map tiles: [OpenStreetMap](https://www.openstreetmap.org/copyright).
+
+
+## GTFS data and licence
+
+The route extract is generated from the Bengaluru BMTC GTFS feed published by [Reclaim.city](https://github.com/reclaimchennai/India_GTFS) and sourced from [Vonter/bmtc-gtfs](https://github.com/Vonter/bmtc-gtfs). The source dataset is made available under the Open Database License (ODbL-1.0); derived route data in this project is attributed accordingly. See the source repository for the full licence and its share-alike requirements. The source warns that some timetable and stop timings may be inaccurate, so these values are displayed as scheduled data, not guaranteed or live arrival predictions.
+
+To generate the first route extract, open **Actions → Refresh BMTC route data → Run workflow** in this repository. The workflow also refreshes the extract daily. It commits only the filtered corridor JSON, not the full GTFS archive.
