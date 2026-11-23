@@ -133,6 +133,7 @@ def main():
         matched_by_route = defaultdict(lambda: {"outbound": [], "inbound": []})
         selected_shapes = set()
         coverage = defaultdict(lambda: {"origin_only": 0, "destination_only": 0, "both": 0})
+        origin_trip_samples = defaultdict(list)
         for tid, rows in times_by_trip.items():
             rows.sort(key=lambda x: int(x.get("stop_sequence") or 0))
             origin_indexes = [i for i, x in enumerate(rows) if x.get("stop_id") in origin_stops]
@@ -144,6 +145,18 @@ def main():
                 coverage[rid_for_coverage]["origin_only"] += 1
             elif destination_indexes:
                 coverage[rid_for_coverage]["destination_only"] += 1
+            if origin_indexes and not destination_indexes and len(origin_trip_samples[rid_for_coverage]) < 2:
+                oi = origin_indexes[0]
+                trip_info = trip_rows[tid]
+                origin_trip_samples[rid_for_coverage].append({
+                    "trip_id": tid,
+                    "headsign": trip_info.get("trip_headsign", ""),
+                    "direction_id": trip_info.get("direction_id", ""),
+                    "stops": [
+                        {"stop_id": row.get("stop_id", ""), "name": stops.get(row.get("stop_id", ""), {}).get("name", "")}
+                        for row in rows[max(0, oi - 5):oi + 16]
+                    ],
+                })
             if not origin_indexes or not destination_indexes:
                 continue
             trip = trip_rows[tid]
@@ -245,6 +258,10 @@ def main():
             "destination": [stops[s] for s in sorted(destination_stops)],
         },
         "stop_name_diagnostics": stop_name_diagnostics,
+        "origin_trip_samples": {
+            r["label"]: [sample for rid in r["route_ids"] for sample in origin_trip_samples[rid]][:2]
+            for r in route_results
+        },
         "trip_coverage_diagnostics": {
             r["label"]: {
                 "origin_only": sum(coverage[rid]["origin_only"] for rid in r["route_ids"]),
