@@ -1,0 +1,38 @@
+name: Refresh BMTC route data
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "30 20 * * *"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: refresh-bmtc-route-data
+  cancel-in-progress: false
+
+jobs:
+  build-route-data:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Extract the seven 378 services and corridor stops
+        run: python scripts/build_route_data.py --output data/route-data.json
+      - name: Commit updated route data
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/route-data.json
+          if git diff --cached --quiet; then
+            echo "Route data is unchanged."
+          else
+            git commit -m "Refresh BMTC 378 corridor route data"
+            git push
+          fi
