@@ -2,7 +2,7 @@
   "use strict";
   const FEED_URL = "https://maps.reclaim.city/bengaluru/rt/vehicle_positions.json";
   const STATUS_URL = "https://maps.reclaim.city/bengaluru/rt/status.json";
-  const POLL_MS = 20000;
+  const POLL_MS = 180000;
   const ROUTES = ["378","378-B","378-C","378-D","378-E","378-C UTH-ELC","378-E D44G-ELC"];
   const $ = (id) => document.getElementById(id);
   let selectedRoute = "all";
@@ -111,7 +111,7 @@
         status.className = "feed-status stale";
         $("feed-message").textContent = "Feed is stale · last position " + Math.round(feedAge/60) + " min ago";
       } else {
-        $("feed-message").textContent = "Feed connected · " + vehicles.length + " vehicles received · refreshed " + new Date().toLocaleTimeString();
+        $("feed-message").textContent = "Feed connected · " + vehicles.length + " vehicles received · refreshed " + new Date().toLocaleTimeString() + " · source updates about every 3 min";
       }
       displayVehicles();
     } catch (error) {
