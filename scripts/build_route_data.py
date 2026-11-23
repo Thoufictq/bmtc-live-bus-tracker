@@ -128,7 +128,8 @@ def main():
             if tid in trip_rows:
                 times_by_trip[tid].append(row)
 
-        # Keep only trips that actually serve both requested corridor stops.
+        # Keep trips serving either Neeladri/Concord and Electronic City 378.
+        # A trip may visit both origin alternatives; record it once per direction.
         matched_by_route = defaultdict(lambda: {"outbound": [], "inbound": []})
         selected_shapes = set()
         for tid, rows in times_by_trip.items():
@@ -139,29 +140,38 @@ def main():
                 continue
             trip = trip_rows[tid]
             rid = trip.get("route_id", "")
+            pairs = []
             for oi in origin_indexes:
                 for di in destination_indexes:
-                    if oi == di:
-                        continue
-                    direction = "outbound" if oi < di else "inbound"
-                    start_row, end_row = (rows[oi], rows[di]) if oi < di else (rows[di], rows[oi])
-                    # A trip can loop past multiple matching platforms; record one ordered pair.
-                    shape_id = trip.get("shape_id", "")
-                    if shape_id:
-                        selected_shapes.add(shape_id)
-                    matched_by_route[rid][direction].append({
-                        "trip_id": tid,
-                        "service_id": trip.get("service_id", ""),
-                        "direction_id": trip.get("direction_id", ""),
-                        "headsign": trip.get("trip_headsign", ""),
-                        "shape_id": shape_id,
-                        "from_stop_id": start_row.get("stop_id", ""),
-                        "to_stop_id": end_row.get("stop_id", ""),
-                        "departure": start_row.get("departure_time") or start_row.get("arrival_time", ""),
-                        "arrival": end_row.get("arrival_time") or end_row.get("departure_time", ""),
-                        "sequence": rows,
-                    })
-                    break
+                    if oi < di:
+                        pairs.append(("outbound", oi, di))
+                    elif di < oi:
+                        pairs.append(("inbound", oi, di))
+            # Prefer one pair per direction per trip. For outbound, use the
+            # origin alternative nearest Electronic City; for inbound, the
+            # first accepted origin encountered after leaving Electronic City.
+            chosen = {}
+            for direction, oi, di in pairs:
+                score = oi if direction == "outbound" else -oi
+                if direction not in chosen or score > chosen[direction][0]:
+                    chosen[direction] = (score, oi, di)
+            for direction, (_, oi, di) in chosen.items():
+                start_row, end_row = (rows[oi], rows[di]) if direction == "outbound" else (rows[di], rows[oi])
+                shape_id = trip.get("shape_id", "")
+                if shape_id:
+                    selected_shapes.add(shape_id)
+                matched_by_route[rid][direction].append({
+                    "trip_id": tid,
+                    "service_id": trip.get("service_id", ""),
+                    "direction_id": trip.get("direction_id", ""),
+                    "headsign": trip.get("trip_headsign", ""),
+                    "shape_id": shape_id,
+                    "from_stop_id": start_row.get("stop_id", ""),
+                    "to_stop_id": end_row.get("stop_id", ""),
+                    "departure": start_row.get("departure_time") or start_row.get("arrival_time", ""),
+                    "arrival": end_row.get("arrival_time") or end_row.get("departure_time", ""),
+                    "sequence": rows,
+                })
 
         shape_points = defaultdict(list)
         if selected_shapes:
