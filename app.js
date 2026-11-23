@@ -7,7 +7,8 @@
   const $ = (id) => document.getElementById(id);
   let selectedRoute = "all";
   let vehicles = [];
-  let map, markers;
+  let map, markers, routeOverlay;
+  let routeData = null;
 
   // Approximate corridor viewport only; verified stop coordinates and route shape
   // will replace this once the exact 378 GTFS stop sequence is confirmed.
@@ -22,6 +23,7 @@
       maxZoom: 19, attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
     }).addTo(map);
     markers = L.layerGroup().addTo(map);
+    routeOverlay = L.layerGroup().addTo(map);
     map.fitBounds(corridorBounds);
   }
 
@@ -34,9 +36,11 @@
   }
   function routeMatches(v, route) {
     if (route === "all") return true;
+    const routeRecord = routeData?.routes?.find(r => r.label === route);
+    const liveRouteId = String(v.trip?.routeId || "");
+    if (routeRecord?.route_ids?.includes(liveRouteId)) return true;
     const haystack = norm([vehicleRoute(v), v.vehicle?.label, v.vehicle?.licensePlate].join(" "));
     const needle = norm(route);
-    // Match a complete route token or the route code embedded in a trip/route id.
     return haystack.includes(needle);
   }
   function inCorridor(v) {
@@ -58,7 +62,56 @@
     const trip = v.trip || {};
     return trip.routeId || trip.tripId || "Route not matched";
   }
+
+  function drawSelectedRoute() {
+    if (!routeOverlay || !window.L) return;
+    routeOverlay.clearLayers();
+    if (!routeData || selectedRoute === "all") return;
+    const record = routeData.routes.find(r => r.label === selectedRoute);
+    const direction = $("direction").value;
+    const segment = record?.directions?.find(d => d.direction === direction);
+    if (!segment) return;
+    if (segment.shape?.length > 1) {
+      const line = L.polyline(segment.shape.map(p => [p.lat,p.lon]), {color:"#7cf0c2",weight:5,opacity:.85});
+      line.addTo(routeOverlay);
+      map.fitBounds(line.getBounds(), {padding:[24,24]});
+    }
+    (segment.stops || []).forEach(stop => {
+      if (!Number.isFinite(stop.lat) || !Number.isFinite(stop.lon)) return;
+      L.circleMarker([stop.lat,stop.lon], {radius:4,color:"#f5fbff",weight:1,fillColor:"#ffbd69",fillOpacity:1})
+        .bindPopup("<strong>"+escapeHtml(stop.name)+"</strong><br>"+escapeHtml(stop.arrival_time || "Scheduled time unavailable"))
+        .addTo(routeOverlay);
+    });
+  }
+  function renderRouteValidation() {
+    const target = $("route-validation");
+    if (!routeData) {
+      target.textContent = "GTFS extract is not available yet. Run the Refresh BMTC route data workflow in GitHub Actions.";
+      return;
+    }
+    const generated = routeData.generated_at ? new Date(routeData.generated_at).toLocaleString() : "unknown";
+    target.innerHTML = "<div style='margin-bottom:7px'>GTFS extract · generated "+escapeHtml(generated)+"</div>" +
+      routeData.routes.map(r => {
+        const dirs = (r.directions || []).map(d => d.direction === "outbound" ? "to Toguru" : "to Infosys").join(" + ");
+        const ok = r.trip_count > 0;
+        return "<div class='route-check'><strong>"+escapeHtml(r.label)+"</strong><span class='"+(ok?"matched":"unmatched")+"'>"+
+          (ok ? r.trip_count+" matching trips · "+dirs : "No matching corridor trip found")+"</span></div>";
+      }).join("");
+    drawSelectedRoute();
+  }
+  async function loadRouteData() {
+    try {
+      const response = await fetch("data/route-data.json?"+Date.now(), {cache:"no-store"});
+      if (!response.ok) throw new Error("not generated");
+      routeData = await response.json();
+      renderRouteValidation();
+    } catch (_) {
+      renderRouteValidation();
+    }
+  }
+
   function displayVehicles() {
+    drawSelectedRoute();
     const visible = vehicles.filter(inCorridor).filter(v => routeMatches(v, selectedRoute));
     $("map-count").textContent = visible.length + " vehicle" + (visible.length === 1 ? "" : "s");
     $("bus-list").innerHTML = visible.length ? visible.map(v => {
@@ -134,6 +187,7 @@
     $("feed-message").textContent = "Direction selected. Route-specific direction matching will activate after GTFS stop-sequence validation.";
   });
   initMap();
+  loadRouteData();
   refresh();
   window.setInterval(refresh, POLL_MS);
 })();
