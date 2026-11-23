@@ -39,7 +39,14 @@ def read_rows(zf: zipfile.ZipFile, filename: str):
 def stop_matches(name: str, kind: str) -> bool:
     value = norm(name)
     if kind == "origin":
-        return "INFOSYSFOUNDATION" in value
+        # The requested boarding landmark is in front of Infosys Foundation
+        # Metro Station. GTFS feeds may label this same Electronic City Phase 1
+        # boarding area as Infosys Foundation, 1st Main Road, or Electronic City 378.
+        return any(alias in value for alias in (
+            "INFOSYSFOUNDATION",
+            "1STMAINROAD",
+            "ELECTRONICCITY378",
+        ))
     return "TOGURU" in value or "THOGUR" in value
 
 def route_matches(route: dict, spec: dict) -> bool:
