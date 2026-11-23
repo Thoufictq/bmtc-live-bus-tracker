@@ -132,10 +132,18 @@ def main():
         # A trip may visit both origin alternatives; record it once per direction.
         matched_by_route = defaultdict(lambda: {"outbound": [], "inbound": []})
         selected_shapes = set()
+        coverage = defaultdict(lambda: {"origin_only": 0, "destination_only": 0, "both": 0})
         for tid, rows in times_by_trip.items():
             rows.sort(key=lambda x: int(x.get("stop_sequence") or 0))
             origin_indexes = [i for i, x in enumerate(rows) if x.get("stop_id") in origin_stops]
             destination_indexes = [i for i, x in enumerate(rows) if x.get("stop_id") in destination_stops]
+            rid_for_coverage = trip_rows[tid].get("route_id", "")
+            if origin_indexes and destination_indexes:
+                coverage[rid_for_coverage]["both"] += 1
+            elif origin_indexes:
+                coverage[rid_for_coverage]["origin_only"] += 1
+            elif destination_indexes:
+                coverage[rid_for_coverage]["destination_only"] += 1
             if not origin_indexes or not destination_indexes:
                 continue
             trip = trip_rows[tid]
@@ -222,6 +230,12 @@ def main():
                 })
                 result["trip_count"] += len(candidates)
 
+    stop_name_diagnostics = [
+        item for item in stops.values()
+        if any(token in norm(item["name"]) for token in ("ELECTRONIC", "ECITY", "NEELADRI", "CONCORD", "WIPRO"))
+    ]
+    stop_name_diagnostics.sort(key=lambda item: (norm(item["name"]), item["stop_id"]))
+
     output = {
         "generated_at": datetime.now(timezone.utc).isoformat(),
         "source": FEED_URL,
@@ -229,6 +243,18 @@ def main():
         "stops_found": {
             "origin": [stops[s] for s in sorted(origin_stops)],
             "destination": [stops[s] for s in sorted(destination_stops)],
+        },
+        "stop_name_diagnostics": stop_name_diagnostics,
+        "trip_coverage_diagnostics": {
+            r["label"]: coverage_by_label
+            for r in route_results
+            for coverage_by_label in [{
+                key: {
+                    "origin_only": sum(coverage[rid]["origin_only"] for rid in r["route_ids"]),
+                    "destination_only": sum(coverage[rid]["destination_only"] for rid in r["route_ids"]),
+                    "both": sum(coverage[rid]["both"] for rid in r["route_ids"]),
+                }
+            }]
         },
         "routes": route_results,
         "notes": [
@@ -244,6 +270,7 @@ def main():
         "output": str(target),
         "origin_stops": len(origin_stops),
         "destination_stops": len(destination_stops),
+        "candidate_stop_names": len(stop_name_diagnostics),
         "routes": [{
             "label": r["label"], "route_ids": len(r["route_ids"]),
             "matched_trips": r["trip_count"],
