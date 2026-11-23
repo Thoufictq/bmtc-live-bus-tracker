@@ -41,8 +41,9 @@ def stop_matches(name: str, kind: str) -> bool:
     if kind == "origin":
         # Either requested boarding point on Neeladri Road is an accepted start.
         return value in ("NEELADRINAGARA", "CONCORDAPARTMENTELECTRONICCITY")
-    # The corridor ends at the Electronic City 378 terminal stop.
-    return value == "ELECTRONICCITY378"
+    # In this GTFS feed the terminal is named "Electronic City" (without 378).
+    # Route-specific stop_times confirm it is immediately beyond Siemens/BHEL/Wipro.
+    return value == "ELECTRONICCITY"
 
 def route_matches(route: dict, spec: dict) -> bool:
     short = norm(route.get("route_short_name", ""))
