@@ -11,7 +11,7 @@ A mobile-friendly live BMTC vehicle tracker for the corridor:
 This first implementation follows the lightweight HTML/CSS/JavaScript structure of the [Boost reference app](https://github.com/gattarakesh-star/Boost).
 
 - Live BMTC GTFS-Realtime vehicle positions.
-- Auto-refresh every 20 seconds.
+- Auto-refresh every 3 minutes, aligned with the BMTC source's approximate update cadence.
 - Route-code filters for the seven requested variants.
 - Map markers and vehicle details when GPS coordinates are present.
 - Feed freshness and stale-data messaging.
@@ -23,7 +23,7 @@ This first implementation follows the lightweight HTML/CSS/JavaScript structure 
 - Feed status: https://maps.reclaim.city/bengaluru/rt/status.json
 - BMTC static GTFS catalog and documentation: https://github.com/reclaimchennai/India_GTFS and https://api.reclaim.city/docs/
 
-The feed is public GTFS-Realtime data. The source documentation says Bengaluru vehicle positions refresh roughly every three minutes. The app polls every 20 seconds, but polling does not make the underlying GPS update faster.
+The feed is public GTFS-Realtime data. The source documentation says Bengaluru vehicle positions refresh roughly every three minutes. The app polls every three minutes; polling more often would not make the underlying GPS update faster.
 
 ## Important validation note
 
