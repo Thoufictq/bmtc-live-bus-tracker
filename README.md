@@ -25,11 +25,23 @@ This first implementation follows the lightweight HTML/CSS/JavaScript structure 
 
 The feed is public GTFS-Realtime data. The source documentation says Bengaluru vehicle positions refresh roughly every three minutes. The app polls every three minutes; polling more often would not make the underlying GPS update faster.
 
-## Important validation note
+## GTFS validation
 
-The requested 378 route variants, their exact stop sequences, direction-specific service patterns, and stop coordinates still need to be matched against the current BMTC GTFS feed. Until that validation is complete, the map uses an approximate Electronic City viewport, route filters match route/trip identifiers only when those identifiers contain the requested code, and the app does **not** invent stop ETAs or a route polyline.
+The generated route extract now matches both corridor endpoints for all seven requested services. The latest successful build (23 November 2026) reports:
 
-A missing GPS marker does not mean a bus is not operating. Some vehicles may not have a current GPS fix or a matched trip.
+| Service | Matched timetable trips |
+|---|---:|
+| 378 | 387 |
+| 378-B | 9 |
+| 378-C | 17 |
+| 378-D | 12 |
+| 378-E | 13 |
+| 378-C UTH-ELC | 38 |
+| 378-E D44G-ELC | 5 |
+
+Each service has route data for both directions, including stop sequences, stop coordinates, and route shapes. The destination is represented in the GTFS feed as **Electronic City**; the passenger-facing destination remains **Electronic City 378**.
+
+These counts are static timetable trips, not buses currently on the road. The live map shows a bus marker only when the real-time feed supplies a matching trip and GPS coordinates. A missing GPS marker does not mean a bus is not operating. The app does not fabricate vehicle positions or live ETAs.
 
 ## Run locally
 
