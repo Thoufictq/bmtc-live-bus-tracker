@@ -160,8 +160,6 @@ def main():
                         "sequence": rows,
                     })
                     break
-                if matched_by_route[rid]["outbound"] or matched_by_route[rid]["inbound"]:
-                    break
 
         shape_points = defaultdict(list)
         if selected_shapes:
