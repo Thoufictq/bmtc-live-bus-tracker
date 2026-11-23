@@ -2,8 +2,8 @@
 
 A mobile-friendly live BMTC vehicle tracker for the corridor:
 
-- **Start:** Infosys Foundation Metro Station, Electronic City Phase 1
-- **Destination:** Toguru Cross
+- **Start:** Neeladri Nagara or Concord Apartment Electronic City
+- **Destination:** Electronic City 378
 - **Requested services:** 378, 378-B, 378-C, 378-D, 378-E, 378-C UTH-ELC, 378-E D44G-ELC
 
 ## Current build
