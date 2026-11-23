@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#0b1420">
+  <meta name="description" content="BMTC live bus tracker for Electronic City Phase 1 to Toguru Cross, Bengaluru.">
+  <title>BMTC Live — Electronic City ↔ Toguru Cross</title>
+  <link rel="preconnect" href="https://unpkg.com">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <main class="shell">
+    <header class="topbar">
+      <a class="brand" href="#" aria-label="BMTC Live home"><span class="brand-mark">B</span><span>BMTC<span class="brand-light"> LIVE</span></span></a>
+      <span class="live-pill"><i></i> LIVE FEED</span>
+    </header>
+
+    <section class="hero">
+      <div class="eyebrow">BENGALURU · BMTC BUS TRACKER</div>
+      <h1>Your bus.<br><em>In real time.</em></h1>
+      <p>Track BMTC services between Electronic City Phase 1 and Toguru Cross.</p>
+      <div class="route-card">
+        <div class="route-point"><span class="point start"></span><div><small>STARTING POINT</small><strong>Infosys Foundation Metro Station</strong><span>Electronic City Phase 1</span></div></div>
+        <div class="route-connector"></div>
+        <div class="route-point"><span class="point end"></span><div><small>DESTINATION</small><strong>Toguru Cross</strong><span>Bengaluru, Karnataka</span></div></div>
+      </div>
+      <div class="route-tools">
+        <label for="direction">Direction</label>
+        <select id="direction">
+          <option value="outbound">Infosys Foundation → Toguru Cross</option>
+          <option value="inbound">Toguru Cross → Infosys Foundation</option>
+        </select>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="section-heading"><div><div class="eyebrow">CHOOSE YOUR SERVICE</div><h2>Bus routes</h2></div><span class="muted" id="route-count">7 services</span></div>
+      <div class="route-filters" id="route-filters">
+        <button class="route-chip active" data-route="all">All</button>
+        <button class="route-chip" data-route="378">378</button>
+        <button class="route-chip" data-route="378-B">378-B</button>
+        <button class="route-chip" data-route="378-C">378-C</button>
+        <button class="route-chip" data-route="378-D">378-D</button>
+        <button class="route-chip" data-route="378-E">378-E</button>
+        <button class="route-chip" data-route="378-C UTH-ELC">378-C UTH-ELC</button>
+        <button class="route-chip" data-route="378-E D44G-ELC">378-E D44G-ELC</button>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="section-heading"><div><div class="eyebrow">VEHICLE POSITIONS</div><h2>Live buses</h2></div><button class="refresh-btn" id="refresh">↻ Refresh</button></div>
+      <div class="feed-status" id="feed-status"><span class="status-dot"></span><span id="feed-message">Connecting to BMTC live feed…</span></div>
+      <div class="bus-list" id="bus-list"><div class="loading-card">Loading live BMTC vehicle positions…</div></div>
+    </section>
+
+    <section class="section">
+      <div class="section-heading"><div><div class="eyebrow">LIVE GPS</div><h2>Bus map</h2></div><span class="muted" id="map-count">Waiting for data</span></div>
+      <div id="map" aria-label="Map showing BMTC vehicle positions"></div>
+      <p class="map-note">Vehicle markers appear only when GPS coordinates are supplied by the live feed. A missing marker does not mean the bus is not operating.</p>
+    </section>
+
+    <section class="section notice">
+      <div class="notice-icon">i</div>
+      <div><strong>Live data, not guessed data</strong><p>GPS positions come from the public BMTC GTFS-Realtime feed. This first build shows live vehicle positions and route-ID matches where the feed provides them. Stop-by-stop timings, confirmed route geometry and ETAs will be added after validating the 378 variants against the BMTC timetable.</p></div>
+    </section>
+
+    <footer>
+      <span>BMTC LIVE · COMMUNITY PROJECT</span>
+      <span>Data: <a href="https://maps.reclaim.city/bengaluru/" target="_blank" rel="noreferrer">Reclaim.city</a> · Map: © OpenStreetMap</span>
+    </footer>
+  </main>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
