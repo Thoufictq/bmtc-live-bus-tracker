@@ -183,8 +183,8 @@
   });
   $("refresh").addEventListener("click", refresh);
   $("direction").addEventListener("change", () => {
-    // Direction control is ready for the validated outbound/inbound trip patterns.
-    $("feed-message").textContent = "Direction selected. Route-specific direction matching will activate after GTFS stop-sequence validation.";
+    drawSelectedRoute();
+    $("feed-message").textContent = "Direction changed. Live GPS remains separate from scheduled GTFS times.";
   });
   initMap();
   loadRouteData();
