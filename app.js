@@ -38,7 +38,10 @@
     if (route === "all") return true;
     const routeRecord = routeData?.routes?.find(r => r.label === route);
     const liveRouteId = String(v.trip?.routeId || "");
+    const liveTripId = String(v.trip?.tripId || "");
     if (routeRecord?.route_ids?.includes(liveRouteId)) return true;
+    const directionData = routeRecord?.directions?.find(d => d.direction === $("direction").value);
+    if (directionData?.trips?.some(t => t.trip_id === liveTripId)) return true;
     const haystack = norm([vehicleRoute(v), v.vehicle?.label, v.vehicle?.licensePlate].join(" "));
     const needle = norm(route);
     return haystack.includes(needle);
