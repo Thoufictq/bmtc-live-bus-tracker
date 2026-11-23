@@ -47,7 +47,6 @@
         <button class="route-chip" data-route="378-C UTH-ELC">378-C UTH-ELC</button>
         <button class="route-chip" data-route="378-E D44G-ELC">378-E D44G-ELC</button>
       </div>
-      <div class="route-validation" id="route-validation">Waiting for verified GTFS route data…</div>
     </section>
 
     <section class="section">
@@ -59,12 +58,7 @@
     <section class="section">
       <div class="section-heading"><div><div class="eyebrow">LIVE GPS</div><h2>Bus map</h2></div><span class="muted" id="map-count">Waiting for data</span></div>
       <div id="map" aria-label="Map showing BMTC vehicle positions"></div>
-      <p class="map-note">Vehicle markers appear only when GPS coordinates are supplied by the live feed. A missing marker does not mean the bus is not operating.</p>
-    </section>
-
-    <section class="section notice">
-      <div class="notice-icon">i</div>
-      <div><strong>Live data, not guessed data</strong><p>GPS positions come from the public BMTC GTFS-Realtime feed. This first build shows live vehicle positions and route-ID matches where the feed provides them. Stop-by-stop timings, confirmed route geometry and ETAs will be added after validating the 378 variants against the BMTC timetable.</p></div>
+      <p class="map-note">Only the seven selected 378 services are shown. Vehicle markers require a current GPS position and a matching route or trip ID.</p>
     </section>
 
     <footer>
